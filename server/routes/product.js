@@ -48,11 +48,22 @@ router.post('/deleteImage', (req, res) => {
 
 router.post('/products', (req, res) => {
   // product collection에 들어 있는 모든 상품 정보를 가져오기
+  let limit = req.body.limit ? parseInt(req.body.limit) : 20;
+  let skip = req.body.skip ? parseInt(req.body.skip) : 0;
+
   Product.find()
     .populate('writer')
+    .skip(skip)
+    .limit(limit)
     .exec((err, products) => {
       if (err) res.status(400).json({ success: false, err });
-      return res.status(200).json({ success: true, products });
+      Product.find()
+        .skip(skip + limit)
+        .limit(1)
+        .exec((err, product) => {
+          if (product.length) return res.status(200).json({ success: true, products, isMore: true });
+          return res.status(200).json({ success: true, products, isMore: false });
+        });
     });
 });
 

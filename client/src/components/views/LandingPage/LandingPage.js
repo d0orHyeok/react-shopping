@@ -8,16 +8,30 @@ import ImageSilder from '../../utils/ImageSilder';
 
 function LandingPage() {
   const [Products, setProducts] = useState([]);
+  const [IsMore, setIsMore] = useState(false);
+  const [Body, setBody] = useState({
+    skip: 0,
+    limit: 8,
+  });
 
   useEffect(() => {
-    Axios.post('/api/product/products').then(res => {
+    getProducts();
+  }, []);
+
+  const getProducts = () => {
+    Axios.post('/api/product/products', Body).then(res => {
       if (res.data.success) {
-        setProducts(res.data.products);
+        setProducts([...Products, ...res.data.products]);
+        setIsMore(res.data.isMore);
+        setBody({
+          ...Body,
+          skip: Body.skip + Body.limit,
+        });
       } else {
         alert('상품들을 가져오는데 실패했습니다.');
       }
     });
-  }, []);
+  };
 
   const renderCard = Products.map((product, index) => {
     return (
@@ -43,10 +57,11 @@ function LandingPage() {
 
       {/* Card */}
       <Row gutter={[16, 16]}>{renderCard}</Row>
-
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <button>더보기</button>
-      </div>
+      {IsMore && (
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <button onClick={getProducts}>더보기</button>
+        </div>
+      )}
     </div>
   );
 }

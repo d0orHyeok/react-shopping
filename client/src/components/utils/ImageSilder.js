@@ -6,7 +6,7 @@ function ImageSilder(props) {
     <Carousel autoplay>
       {props.images.map((image, index) => (
         <div key={index}>
-          <img style={{ width: '100%', maxHeight: '150px' }} src={`http://localhost:5000/${image}`} alt="product" />
+          <img style={{ width: '100%', height: '150px' }} src={`http://localhost:5000/${image}`} alt="product" />
         </div>
       ))}
     </Carousel>

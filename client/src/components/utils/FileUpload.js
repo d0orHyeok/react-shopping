@@ -25,11 +25,12 @@ function FileUpload(props) {
 
   const deleteHandler = image => {
     const currentIndex = Images.indexOf(image);
-
     let newImages = [...Images];
     newImages.splice(currentIndex, 1);
     setImages(newImages);
     props.refreshFunction(newImages);
+
+    Axios.post('/api/product/deleteImage', { path: Images[currentIndex] });
   };
 
   return (

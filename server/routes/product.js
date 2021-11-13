@@ -1,6 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const { Product } = require('../models/Product');
+const fs = require('fs');
 
 const router = express.Router();
 //=================================
@@ -35,6 +36,13 @@ router.post('/image', (req, res) => {
       return res.json({ success: false, err });
     }
     return res.json({ success: true, filePath: res.req.file.path, fileName: res.req.file.filename });
+  });
+});
+
+router.post('/deleteImage', (req, res) => {
+  fs.unlink(`${req.body.path}`, err => {
+    if (err) return res.json({ success: false, err });
+    return res.json({ success: true });
   });
 });
 

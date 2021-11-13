@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Typography, Button, Form, Input } from 'antd';
 import FileUpload from '../../utils/FileUpload';
+import Axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -15,15 +17,17 @@ const Continents = [
   { key: 7, value: 'Antarctica' },
 ];
 
-function UploadProductPage() {
+function UploadProductPage(props) {
+  const navigate = useNavigate();
+
   const [Product, setProduct] = useState({
     title: '',
     desc: '',
     price: 0,
-    continents: 3,
-    // images: [],
+    continents: 2,
+    images: [],
   });
-  const { title, desc, price, continents } = Product;
+  const { title, desc, price, continents, images } = Product;
 
   const onChangeHandler = e => {
     const { value, name } = e.currentTarget;
@@ -33,14 +37,46 @@ function UploadProductPage() {
     });
   };
 
+  const updateImages = newImages => {
+    setProduct({
+      ...Product,
+      images: newImages,
+    });
+  };
+
+  const submitHandler = () => {
+    if (!title || !desc || !price || !continents || !images) {
+      return alert('모든 값을 입력해주세요');
+    }
+    // 서버에 채운 값들을 request로 보낸다.
+
+    const body = {
+      writer: props.user.userData._id,
+      title: title,
+      description: desc,
+      price: price,
+      images: images,
+      continents: continents,
+    };
+
+    Axios.post('/api/product', body).then(res => {
+      if (res.data.success) {
+        alert('상품 업로드에 성공했습니다.');
+        navigate('/');
+      } else {
+        alert('상품 업로드에 실패했습니다.');
+      }
+    });
+  };
+
   return (
     <div style={{ maxWidth: '700px', margin: '2rem auto' }}>
       <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
         <Title level={2}>여행 상품 업로드</Title>
       </div>
 
-      <Form>
-        <FileUpload />
+      <Form onFinish={submitHandler}>
+        <FileUpload refreshFunction={updateImages} />
         <br />
         <br />
         <label>이름</label>
@@ -64,7 +100,7 @@ function UploadProductPage() {
         </select>
         <br />
         <br />
-        <Button>확인</Button>
+        <Button htmlType="submit">확인</Button>
       </Form>
     </div>
   );

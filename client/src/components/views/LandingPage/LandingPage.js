@@ -4,7 +4,9 @@ import { Col, Card, Row } from 'antd';
 import Meta from 'antd/lib/card/Meta';
 import { RocketOutlined } from '@ant-design/icons';
 
+import { continents } from './Sections/Datas';
 import ImageSilder from '../../utils/ImageSilder';
+import CheckBox from './Sections/CheckBox';
 
 function LandingPage() {
   const [Products, setProducts] = useState([]);
@@ -12,11 +14,16 @@ function LandingPage() {
   const [Body, setBody] = useState({
     skip: 0,
     limit: 8,
+    filters: {
+      continents: [],
+      price: [],
+    },
   });
+  const [Filters, setFilters] = useState(0);
 
   useEffect(() => {
     getProducts();
-  }, []);
+  }, [Filters]);
 
   const getProducts = () => {
     Axios.post('/api/product/products', Body).then(res => {
@@ -31,6 +38,22 @@ function LandingPage() {
         alert('상품들을 가져오는데 실패했습니다.');
       }
     });
+  };
+
+  const handleFilters = (filters, category) => {
+    const newFilters = {
+      ...Body.filters,
+      continents: filters,
+    };
+
+    setBody({
+      ...Body,
+      skip: 0,
+      filters: newFilters,
+    });
+
+    setProducts([]);
+    setFilters(filters.length);
   };
 
   const renderCard = Products.map((product, index) => {
@@ -52,6 +75,10 @@ function LandingPage() {
         </h2>
       </div>
       {/* Filter */}
+
+      {/* CheckBox */}
+      <CheckBox list={continents} handleFilters={filters => handleFilters(filters, 'continents')} />
+      {/* RadioBox */}
 
       {/* Search */}
 

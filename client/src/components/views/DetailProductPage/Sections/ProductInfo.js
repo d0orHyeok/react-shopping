@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Descriptions, Button } from 'antd';
+import { useDispatch } from 'react-redux';
+import { addToCart } from '../../../../_actions/user_actions';
 
 function ProductInfo(props) {
-  const onClickAddCart = () => {};
+  const dispatch = useDispatch();
+
+  const onClickAddCart = () => {
+    dispatch(addToCart(props.detail._id));
+  };
 
   return (
     <React.Fragment>

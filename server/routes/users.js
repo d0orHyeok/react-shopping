@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { User } = require('../models/User');
 const { auth } = require('../middleware/auth');
+const { Product } = require('../models/Product');
 
 //=================================
 //             User
@@ -103,6 +104,26 @@ router.post('/addToCart', auth, (req, res) => {
       );
     }
   });
+});
+
+router.post('/removeFromCart', auth, (req, res) => {
+  // Cart에서 상품정보를 지우고
+  User.findOneAndUpdate(
+    { _id: req.user._id },
+    {
+      $pull: {
+        cart: {
+          id: req.body.productId,
+        },
+      },
+    },
+    { new: true },
+    (err, userInfo) => {
+      if (err) return res.status(400).json({ success: false, err });
+      // 수정된 Cart 정보를 가져오기
+      return res.status(200).json({ success: true, deletedProduct: req.body.productId });
+    }
+  );
 });
 
 module.exports = router;

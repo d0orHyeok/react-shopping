@@ -1,4 +1,12 @@
-import { LOGIN_USER, REGISTER_USER, AUTH_USER, LOGOUT_USER, ADD_TO_CART, GET_CART_ITEMS } from '../_actions/types';
+import {
+  LOGIN_USER,
+  REGISTER_USER,
+  AUTH_USER,
+  LOGOUT_USER,
+  ADD_TO_CART,
+  GET_CART_ITEMS,
+  REMOVE_CART_ITEM,
+} from '../_actions/types';
 
 export default function user_reducer(state = {}, action) {
   switch (action.type) {
@@ -14,6 +22,14 @@ export default function user_reducer(state = {}, action) {
       return { ...state, userData: { ...state.userData, cart: action.payload.userInfoCart } };
     case GET_CART_ITEMS:
       return { ...state, cartDetail: action.payload.product };
+    case REMOVE_CART_ITEM:
+      let newCartDetail = [];
+      let newCart = [];
+      if (action.payload.success) {
+        newCartDetail = state.cartDetail.filter(product => product._id !== action.payload.deletedProduct);
+        newCart = state.userData.cart.filter(product => product.id !== action.payload.deletedProduct);
+      }
+      return { ...state, userData: { ...state.userData, cart: newCart }, cartDetail: newCartDetail };
     default:
       return state;
   }

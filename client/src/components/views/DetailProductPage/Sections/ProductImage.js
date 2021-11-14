@@ -8,7 +8,7 @@ function ProductImage(props) {
     if (props.detail.images && props.detail.images.length > 0) {
       let images = [];
       props.detail.images.map(img => {
-        images.push({
+        return images.push({
           original: `http://localhost:5000/${img}`,
           thumbnail: `http://localhost:5000/${img}`,
         });

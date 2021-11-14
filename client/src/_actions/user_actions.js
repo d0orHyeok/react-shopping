@@ -1,5 +1,13 @@
 import axios from 'axios';
-import { LOGIN_USER, REGISTER_USER, AUTH_USER, LOGOUT_USER, ADD_TO_CART, GET_CART_ITEMS } from './types';
+import {
+  LOGIN_USER,
+  REGISTER_USER,
+  AUTH_USER,
+  LOGOUT_USER,
+  ADD_TO_CART,
+  GET_CART_ITEMS,
+  REMOVE_CART_ITEM,
+} from './types';
 import { USER_SERVER } from '../components/Config.js';
 
 export function registerUser(dataToSubmit) {
@@ -69,6 +77,21 @@ export function getCartItems(cartItems, userCart) {
 
   return {
     type: GET_CART_ITEMS,
+    payload: request,
+  };
+}
+
+export function removeCartItem(productId) {
+  const request = axios.post(`${USER_SERVER}/removeFromCart`, { productId }).then(response => {
+    if (!response.data.success) {
+      response.data.deletedProduct = { ...response.data, deletedProduct: null };
+    }
+
+    return response.data;
+  });
+
+  return {
+    type: REMOVE_CART_ITEM,
     payload: request,
   };
 }

@@ -8,6 +8,7 @@ import { continents, price } from './Sections/Datas';
 import ImageSilder from '../../utils/ImageSilder';
 import CheckBox from './Sections/CheckBox';
 import RadioBox from './Sections/RadioBox';
+import SearchFeature from './Sections/SearchFeature';
 
 function LandingPage() {
   const [Products, setProducts] = useState([]);
@@ -16,6 +17,7 @@ function LandingPage() {
     // 상품을 가져올 때 사용할 조건
     skip: 0,
     limit: 8,
+    searchText: '',
     filters: {
       continents: [],
       price: [],
@@ -71,6 +73,15 @@ function LandingPage() {
     setFilters(!Filters);
   };
 
+  const updateSearchText = text => {
+    setBody({
+      ...Body,
+      skip: 0,
+      searchText: text,
+    });
+    setFilters(!Filters);
+  };
+
   // 상품목록 JSX
   const renderCard = () =>
     Products.length > 0 ? (
@@ -95,8 +106,8 @@ function LandingPage() {
           <RocketOutlined />
         </h2>
       </div>
-      {/* Filter */}
 
+      {/* Filter */}
       <Row gutter={[16, 16]}>
         <Col lg={12} md={12} xs={24}>
           {/* CheckBox */}
@@ -107,9 +118,11 @@ function LandingPage() {
           <RadioBox list={price} handleFilters={filters => handleFilters(filters, 'price')} />
         </Col>
       </Row>
-      <br />
 
       {/* Search */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '1rem auto' }}>
+        <SearchFeature refreshFunction={updateSearchText} />
+      </div>
 
       {/* Card */}
       <Row gutter={[16, 16]}>{renderCard()}</Row>

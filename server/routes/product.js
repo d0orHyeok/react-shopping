@@ -50,6 +50,7 @@ router.post('/products', (req, res) => {
   // product collection에 들어 있는 모든 상품 정보를 가져오기
   let limit = req.body.limit ? parseInt(req.body.limit) : 20;
   let skip = req.body.skip ? parseInt(req.body.skip) : 0;
+  let term = req.body.searchText;
   const findArgs = {};
 
   for (let key in req.body.filters) {
@@ -65,21 +66,40 @@ router.post('/products', (req, res) => {
     }
   }
 
-  Product.find(findArgs)
-    .populate('writer')
-    .skip(skip)
-    .limit(limit)
-    .exec((err, products) => {
-      if (err) res.status(400).json({ success: false, err });
-      // 더 불러올 목록이 있는지 확인하여 isMore에 표시
-      Product.find(findArgs)
-        .skip(skip + limit)
-        .limit(1)
-        .exec((err, product) => {
-          if (product.length) return res.status(200).json({ success: true, products, isMore: true });
-          return res.status(200).json({ success: true, products, isMore: false });
-        });
-    });
+  if (term) {
+    Product.find(findArgs)
+      .find({ $text: { $search: term } })
+      .populate('writer')
+      .skip(skip)
+      .limit(limit)
+      .exec((err, products) => {
+        if (err) res.status(400).json({ success: false, err });
+        // 더 불러올 목록이 있는지 확인하여 isMore에 표시
+        Product.find(findArgs)
+          .skip(skip + limit)
+          .limit(1)
+          .exec((err, product) => {
+            if (product.length) return res.status(200).json({ success: true, products, isMore: true });
+            return res.status(200).json({ success: true, products, isMore: false });
+          });
+      });
+  } else {
+    Product.find(findArgs)
+      .populate('writer')
+      .skip(skip)
+      .limit(limit)
+      .exec((err, products) => {
+        if (err) res.status(400).json({ success: false, err });
+        // 더 불러올 목록이 있는지 확인하여 isMore에 표시
+        Product.find(findArgs)
+          .skip(skip + limit)
+          .limit(1)
+          .exec((err, product) => {
+            if (product.length) return res.status(200).json({ success: true, products, isMore: true });
+            return res.status(200).json({ success: true, products, isMore: false });
+          });
+      });
+  }
 });
 
 module.exports = router;

@@ -1,4 +1,4 @@
-import { LOGIN_USER, REGISTER_USER, AUTH_USER, LOGOUT_USER, ADD_TO_CART } from '../_actions/types';
+import { LOGIN_USER, REGISTER_USER, AUTH_USER, LOGOUT_USER, ADD_TO_CART, GET_CART_ITEMS } from '../_actions/types';
 
 export default function user_reducer(state = {}, action) {
   switch (action.type) {
@@ -12,6 +12,8 @@ export default function user_reducer(state = {}, action) {
       return { ...state };
     case ADD_TO_CART:
       return { ...state, userData: { ...state.userData, cart: action.payload.userInfoCart } };
+    case GET_CART_ITEMS:
+      return { ...state, cartDetail: action.payload.product };
     default:
       return state;
   }

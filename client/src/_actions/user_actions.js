@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { LOGIN_USER, REGISTER_USER, AUTH_USER, LOGOUT_USER, ADD_TO_CART } from './types';
+import { LOGIN_USER, REGISTER_USER, AUTH_USER, LOGOUT_USER, ADD_TO_CART, GET_CART_ITEMS } from './types';
 import { USER_SERVER } from '../components/Config.js';
 
 export function registerUser(dataToSubmit) {
@@ -47,6 +47,28 @@ export function addToCart(id) {
 
   return {
     type: ADD_TO_CART,
+    payload: request,
+  };
+}
+
+export function getCartItems(cartItems, userCart) {
+  const request = axios.get(`/api/product/products_by_id?id=${cartItems}&type=array`).then(response => {
+    // Product Collection에서 데이터를 가져와 Qunatity 정보를 추가
+    response.data.success
+      ? userCart.forEach(cartItem => {
+          response.data.product.forEach((productDetail, index) => {
+            if (cartItem.id === productDetail._id) {
+              response.data.product[index].quantity = cartItem.quantity;
+            }
+          });
+        })
+      : (response.data.product = []);
+
+    return response.data;
+  });
+
+  return {
+    type: GET_CART_ITEMS,
     payload: request,
   };
 }

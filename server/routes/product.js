@@ -104,9 +104,14 @@ router.post('/products', (req, res) => {
 
 router.get('/products_by_id', (req, res) => {
   let type = req.query.type;
-  let productId = req.query.id;
+  let productIds = req.query.id;
 
-  Product.find({ _id: productId })
+  if (type === 'array') {
+    let ids = req.query.id.split(',');
+    productIds = ids.map(item => item);
+  }
+
+  Product.find({ _id: productIds })
     .populate('writer')
     .exec((err, product) => {
       if (err) return res.status(400).json({ success: false, err });

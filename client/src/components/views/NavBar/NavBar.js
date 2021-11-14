@@ -32,7 +32,7 @@ function NavBar() {
           <AlignRightOutlined />
         </Button>
         <Drawer
-          title="Basic Drawer"
+          title="Shopping"
           placement="right"
           className="menu_drawer"
           closable={false}

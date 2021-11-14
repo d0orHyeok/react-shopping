@@ -8,6 +8,7 @@ import RegisterPage from './views/RegisterPage/RegisterPage.js';
 import NavBar from './views/NavBar/NavBar';
 import Footer from './views/Footer/Footer';
 import UploadProductPage from './views/UploadProductPage/UploadProductPage';
+import DetailProductPage from './views/DetailProductPage/DetailProductPage';
 
 //null   Anyone Can go inside
 //true   only logged in user can go inside
@@ -23,6 +24,7 @@ function App() {
           <Route path="/login" element={React.createElement(Auth(LoginPage, false))} />
           <Route path="/register" element={React.createElement(Auth(RegisterPage, false))} />
           <Route path="/product/upload" element={React.createElement(Auth(UploadProductPage, true))} />
+          <Route path="/product/:productId" element={React.createElement(Auth(DetailProductPage, null))} />
         </Routes>
       </div>
       <Footer />

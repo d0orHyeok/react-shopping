@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Menu } from 'antd';
 import axios from 'axios';
 import { USER_SERVER } from '../../../Config';
@@ -8,6 +8,8 @@ import { useSelector } from 'react-redux';
 
 function RightMenu(props) {
   const user = useSelector(state => state.user);
+
+  useEffect(() => {}, [user]);
 
   const navigate = useNavigate();
 
@@ -23,18 +25,20 @@ function RightMenu(props) {
 
   if (user.userData && !user.userData.isAuth) {
     return (
-      <Menu mode={props.mode}>
-        <Menu.Item key="mail">
-          <a href="/login">Signin</a>
-        </Menu.Item>
-        <Menu.Item key="app">
-          <a href="/register">Signup</a>
-        </Menu.Item>
-      </Menu>
+      <p>
+        <Menu disabledOverflow="true" mode={props.mode}>
+          <Menu.Item key="login">
+            <a href="/login">Signin</a>
+          </Menu.Item>
+          <Menu.Item key="register">
+            <a href="/register">Signup</a>
+          </Menu.Item>
+        </Menu>
+      </p>
     );
   } else {
     return (
-      <Menu mode={props.mode}>
+      <Menu disabledOverflow="true" mode={props.mode}>
         <Menu.Item key="upload">
           <a href="/product/upload">Upload</a>
         </Menu.Item>

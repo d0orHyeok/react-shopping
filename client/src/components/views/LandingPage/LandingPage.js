@@ -88,9 +88,11 @@ function LandingPage() {
       Products.map((product, index) => {
         return (
           <Col key={index} lg={6} md={12} xs={24}>
-            <Card cover={<ImageSilder images={product.images} />}>
-              <Meta title={product.title} description={`$${product.price}`} />
-            </Card>
+            <a href={`/product/${product._id}`}>
+              <Card cover={<ImageSilder images={product.images} />}>
+                <Meta title={product.title} description={`$${product.price}`} />
+              </Card>
+            </a>
           </Col>
         );
       })

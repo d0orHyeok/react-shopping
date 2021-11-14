@@ -50,11 +50,18 @@ router.post('/products', (req, res) => {
   // product collection에 들어 있는 모든 상품 정보를 가져오기
   let limit = req.body.limit ? parseInt(req.body.limit) : 20;
   let skip = req.body.skip ? parseInt(req.body.skip) : 0;
-  let findArgs = {};
+  const findArgs = {};
 
   for (let key in req.body.filters) {
     if (req.body.filters[key].length) {
-      findArgs[key] = req.body.filters[key];
+      if (key === 'price') {
+        findArgs[key] = {
+          $gte: req.body.filters[key][0],
+          $lte: req.body.filters[key][1],
+        };
+      } else {
+        findArgs[key] = req.body.filters[key];
+      }
     }
   }
 
@@ -64,6 +71,7 @@ router.post('/products', (req, res) => {
     .limit(limit)
     .exec((err, products) => {
       if (err) res.status(400).json({ success: false, err });
+      // 더 불러올 목록이 있는지 확인하여 isMore에 표시
       Product.find(findArgs)
         .skip(skip + limit)
         .limit(1)

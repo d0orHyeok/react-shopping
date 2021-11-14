@@ -4,14 +4,16 @@ import { Col, Card, Row } from 'antd';
 import Meta from 'antd/lib/card/Meta';
 import { RocketOutlined } from '@ant-design/icons';
 
-import { continents } from './Sections/Datas';
+import { continents, price } from './Sections/Datas';
 import ImageSilder from '../../utils/ImageSilder';
 import CheckBox from './Sections/CheckBox';
+import RadioBox from './Sections/RadioBox';
 
 function LandingPage() {
   const [Products, setProducts] = useState([]);
   const [IsMore, setIsMore] = useState(false);
   const [Body, setBody] = useState({
+    // 상품을 가져올 때 사용할 조건
     skip: 0,
     limit: 8,
     filters: {
@@ -19,7 +21,7 @@ function LandingPage() {
       price: [],
     },
   });
-  const [Filters, setFilters] = useState(0);
+  const [Filters, setFilters] = useState(false);
 
   useEffect(() => {
     getProducts();
@@ -28,7 +30,11 @@ function LandingPage() {
   const getProducts = () => {
     Axios.post('/api/product/products', Body).then(res => {
       if (res.data.success) {
-        setProducts([...Products, ...res.data.products]);
+        if (res.data.isMore) {
+          setProducts([...Products, ...res.data.products]);
+        } else {
+          setProducts(res.data.products);
+        }
         setIsMore(res.data.isMore);
         setBody({
           ...Body,
@@ -41,9 +47,20 @@ function LandingPage() {
   };
 
   const handleFilters = (filters, category) => {
+    let array = [];
+    if (category === 'price') {
+      for (let key in price) {
+        if (price[key]._id === parseInt(filters, 10)) {
+          array = price[key].array;
+        }
+      }
+    } else {
+      array = filters;
+    }
+
     const newFilters = {
       ...Body.filters,
-      continents: filters,
+      [category]: array,
     };
 
     setBody({
@@ -51,20 +68,24 @@ function LandingPage() {
       skip: 0,
       filters: newFilters,
     });
-
-    setProducts([]);
-    setFilters(filters.length);
+    setFilters(!Filters);
   };
 
-  const renderCard = Products.map((product, index) => {
-    return (
-      <Col key={index} lg={6} md={12} xs={24}>
-        <Card cover={<ImageSilder images={product.images} />}>
-          <Meta title={product.title} description={`$${product.price}`} />
-        </Card>
-      </Col>
+  // 상품목록 JSX
+  const renderCard = () =>
+    Products.length > 0 ? (
+      Products.map((product, index) => {
+        return (
+          <Col key={index} lg={6} md={12} xs={24}>
+            <Card cover={<ImageSilder images={product.images} />}>
+              <Meta title={product.title} description={`$${product.price}`} />
+            </Card>
+          </Col>
+        );
+      })
+    ) : (
+      <h3 style={{ width: '100%', textAlign: 'center' }}> Product Not Found</h3>
     );
-  });
 
   return (
     <div style={{ width: '75%', margin: '3rem auto' }}>
@@ -76,14 +97,22 @@ function LandingPage() {
       </div>
       {/* Filter */}
 
-      {/* CheckBox */}
-      <CheckBox list={continents} handleFilters={filters => handleFilters(filters, 'continents')} />
-      {/* RadioBox */}
+      <Row gutter={[16, 16]}>
+        <Col lg={12} md={12} xs={24}>
+          {/* CheckBox */}
+          <CheckBox list={continents} handleFilters={filters => handleFilters(filters, 'continents')} />
+        </Col>
+        <Col lg={12} md={12} xs={24}>
+          {/* RadioBox */}
+          <RadioBox list={price} handleFilters={filters => handleFilters(filters, 'price')} />
+        </Col>
+      </Row>
+      <br />
 
       {/* Search */}
 
       {/* Card */}
-      <Row gutter={[16, 16]}>{renderCard}</Row>
+      <Row gutter={[16, 16]}>{renderCard()}</Row>
       {IsMore && (
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <button onClick={getProducts}>더보기</button>

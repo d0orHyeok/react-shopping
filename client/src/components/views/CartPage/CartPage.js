@@ -4,8 +4,9 @@ import { getCartItems, removeCartItem } from '../../../_actions/user_actions';
 import { Empty } from 'antd';
 
 import UserCardBlock from './Sections/UserCardBlock';
+import Paypal from '../../utils/Paypal';
 
-function CartPage(props) {
+function CartPage() {
   const dispatch = useDispatch();
   const user = useSelector(state => state.user);
 
@@ -49,7 +50,10 @@ function CartPage(props) {
       <div style={{ marginTop: '3rem' }}>
         {user.cartDetail && user.cartDetail.length > 0 ? (
           //   Cart에 상품이 있는경우
-          <h2>Total Amount: ${Total}</h2>
+          <React.Fragment>
+            <h2>Total Amount: ${Total}</h2>
+            <Paypal />
+          </React.Fragment>
         ) : (
           //   Cart에 상품이 없는 경우
           <Empty description={false} />

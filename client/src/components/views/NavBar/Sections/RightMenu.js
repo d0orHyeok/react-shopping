@@ -46,6 +46,9 @@ function RightMenu(props) {
   } else {
     return (
       <Menu style={{ marginTop: '1rem' }} disabledOverflow="true" mode={props.mode}>
+        <Menu.Item key="history">
+          <a href="/user/history">History</a>
+        </Menu.Item>
         <Menu.Item key="upload">
           <a href="/product/upload">Upload</a>
         </Menu.Item>

@@ -6,6 +6,7 @@ import {
   ADD_TO_CART,
   GET_CART_ITEMS,
   REMOVE_CART_ITEM,
+  ON_SUCCESS_BUY,
 } from '../_actions/types';
 
 export default function user_reducer(state = {}, action) {
@@ -30,6 +31,12 @@ export default function user_reducer(state = {}, action) {
         newCart = state.userData.cart.filter(product => product.id !== action.payload.deletedProduct);
       }
       return { ...state, userData: { ...state.userData, cart: newCart }, cartDetail: newCartDetail };
+    case ON_SUCCESS_BUY:
+      return {
+        ...state,
+        userData: { ...state.userData, cart: action.payload.cart },
+        cartDetail: action.payload.cartDetail,
+      };
     default:
       return state;
   }

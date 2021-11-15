@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
+const async = require('async');
 const { User } = require('../models/User');
 const { auth } = require('../middleware/auth');
 const { Product } = require('../models/Product');
+const { Payment } = require('../models/Payment');
 
 //=================================
 //             User
@@ -122,6 +124,65 @@ router.post('/removeFromCart', auth, (req, res) => {
       if (err) return res.status(400).json({ success: false, err });
       // 수정된 Cart 정보를 가져오기
       return res.status(200).json({ success: true, deletedProduct: req.body.productId });
+    }
+  );
+});
+
+router.post('/successBuy', auth, (req, res) => {
+  let history = [];
+  let transactionData = {};
+
+  req.body.cartDetail.forEach(item => {
+    history.push({
+      dateOfPurchase: Date.now(),
+      name: item.title,
+      id: item._id,
+      price: item.price,
+      quantity: item.quantity,
+      paymentId: req.body.paymentData.paymentID,
+    });
+  });
+
+  transactionData = {
+    user: {
+      id: req.user._id,
+      name: req.user.name,
+      email: req.user.email,
+    },
+    data: req.body.paymentData,
+    product: history,
+  };
+
+  User.findOneAndUpdate(
+    // User Collection의 history에 간단한 결제정보 넣어주기
+    { _id: req.user._id },
+    { $push: { history: history }, $set: { cart: [] } },
+    { new: true },
+    (err, userInfo) => {
+      if (err) return res.json({ success: false, err });
+
+      // Payment Collection에 상세결제정보 넣어주기
+      const payment = new Payment(transactionData);
+      payment.save((err, doc) => {
+        if (err) return res.json({ success: false, err });
+
+        // Product Collection에 몇개의 상품이 팔렸는지 넣어주기
+        let products = [];
+        doc.product.forEach(item => {
+          products.push({ id: item.id, quantity: item.quantity });
+        });
+
+        async.eachSeries(
+          products,
+          (product, callback) => {
+            Product.updateOne({ _id: product.id }, { $inc: { sold: product.quantity } }, { new: false }, callback);
+          },
+          err => {
+            if (err) return res.json({ success: false, err });
+            return res.status(200).json({ success: true, cart: userInfo.cart, cartDetail: [] });
+          }
+        );
+      });
     }
   );
 });
